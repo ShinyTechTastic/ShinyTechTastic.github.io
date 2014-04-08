@@ -1,0 +1,26 @@
+#sidebar {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  width:20em;
+  border:1px solid black;
+}
+
+#header {
+  position:absolute;
+  top:0;
+  right:0;
+  left:20em;
+  height:3em;
+  border:1px solid black;
+}
+
+#body {
+  position:absolute;
+  top:3em;
+  right:0;
+  left:20em;
+  bottom:0;
+  border:1px solid black;
+}
