@@ -27,17 +27,32 @@ function draw(){
   var width = canvas.width;
   var height = canvas.height;
   
-  var tilesW = width/scale;
-  var tilesH = height/scale;
+  var tilesW = Math.ceil(width/scale)+2;
+  var tilesH = Math.ceil(height/scale)+2;
   
-  for ( var x=0; x<tilesW ; x++ ){
-    for ( var y=0; y<tilesH ; y++ ){
+  var startX = Math.floor(-viewX/scale)-1;
+  var startY = Math.floor(-viewY/scale)-1;
+  var endX = startX + tilesW;
+  var endY = startY + tilesH;
+  
+  ctx.save();
+  ctx.translate( viewX , viewY );
+  ctx.scale( scale , scale );
+  //ctx.font = "0.2pt Arial";
+      
+  for ( var x=startX; x<endX ; x++ ){
+    for ( var y=startY; y<endY ; y++ ){
       var n = world.getMapAt(x,y);
       var s = surface[ n.surface ] || missingSurface;
-      ctx.fillStyle = s.fillStyle;//"rgb(200,0,0)";
-      ctx.fillRect (x*scale, y*scale, scale, scale);
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.fillStyle = s.fillStyle;
+      ctx.fillRect(0.0, 0.0, 1.0, 1.0);
+      ctx.restore();
     }
   }
+  
+  ctx.restore();
   /*
         ctx.fillStyle = "rgb(200,0,0)";
         ctx.fillRect (x, y, 55, 50);
@@ -49,6 +64,61 @@ function draw(){
 
 function update(){
 }
+
+
+function getMousePos(evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+var stateDragging = {
+  pos:{x:0,y:0},
+  mousemove:function(pos){
+    var dx = pos.x - this.pos.x;
+    var dy = pos.y - this.pos.y;
+    this.pos = pos;
+    viewX += dx;
+    viewY += dy;
+//    console.log( viewX , viewY );
+  },
+  mouseup:function(){
+    state = stateReady;
+  }
+}
+
+var stateReady = {
+  mousedown:function( pos ){
+    state = stateDragging;
+    state.pos = pos;
+  }
+}
+
+var state = stateReady;
+
+canvas.addEventListener("mousedown", function(event){
+//  console.log("mousedown");
+  if ( state.mousedown ){
+    state.mousedown( getMousePos( event ) );
+  }
+}, true /* consume? */ );
+
+canvas.addEventListener('mousemove', function(event) {
+//  console.log("mousemove");
+  if ( state.mousemove ){
+    state.mousemove( getMousePos( event ) );
+  }
+}, true );
+
+canvas.addEventListener('mouseup', function(evetn) {
+//  console.log("mouseup");
+  if ( state.mouseup ){
+    state.mouseup( getMousePos( event ) );
+  }
+}, true );
+
 
 setInterval(  update , 10 );
 setInterval(  draw , 20 );

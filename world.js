@@ -11,7 +11,8 @@ var world = (function(){
   }
   
   function generateMap(x,y,id){
-    return { surface:(((x+y)/5)%2) };
+    //return { surface:Math.floor((Math.abs(x+y)/5)%3) };
+    return { surface:Math.floor(Math.random()*3) };
   }
   
   function getId(x,y){
