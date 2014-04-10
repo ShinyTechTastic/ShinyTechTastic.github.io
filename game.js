@@ -86,6 +86,9 @@ var stateDragging = {
   },
   mouseup:function(){
     state = stateReady;
+  },
+  mouseout:function(){
+    state = stateReady;
   }
 }
 
@@ -112,13 +115,19 @@ canvas.addEventListener('mousemove', function(event) {
   }
 }, true );
 
-canvas.addEventListener('mouseup', function(evetn) {
+canvas.addEventListener('mouseup', function(event) {
 //  console.log("mouseup");
   if ( state.mouseup ){
     state.mouseup( getMousePos( event ) );
   }
 }, true );
 
+canvas.addEventListener('mouseout', function(event) {
+//  console.log("mouseout");
+  if ( state.mouseout ){
+    state.mouseout( getMousePos( event ) );
+  }
+}, true );
 
 setInterval(  update , 10 );
 setInterval(  draw , 20 );
