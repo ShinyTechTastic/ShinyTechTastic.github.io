@@ -6,16 +6,20 @@ var ctx = canvas.getContext('2d');
 var viewX = 0.0; // these control the view position
 var viewY = 0.0;
 
-var scale = 32; // the size of each tile
+var scale =  8; // the size of each tile
 
 
-var surface = [
-  /* 0 */ { fillStyle:"rgb(200,0,0)"},
-  /* 1 */ { fillStyle:"rgb(200,200,0)"},
-  /* 2 */ { fillStyle:"rgb(0,0,200)"}
-  ];
+var surface = {
+   0 : { fillStyle:"rgb(0,0,80)"},
+   1 : { fillStyle:"rgb(20,20,160)"},
+   2 : { fillStyle:"rgb(200,200,0)"},
+   3 : { fillStyle:"rgb(50,200,50)"},
+   4 : { fillStyle:"rgb(30,100,30)"},
+   5 : { fillStyle:"rgb(200,200,200)"},
+   6 : { fillStyle:"rgb(250,250,250)"}
+  };
 
-var missingSurface = { fillStlye:"rgb(255,128,128)" };
+var missingSurface = { fillStyle:"rgb(255,128,128)" };
 
 function draw(){
   if ( canvas.width != body.clientWidth ||
