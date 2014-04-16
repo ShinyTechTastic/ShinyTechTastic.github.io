@@ -19,7 +19,25 @@ var surface = {
    6 : { fillStyle:"rgb(250,250,250)"}
   };
 
+var vegstyle = {
+  0:{}
+};
+
 var missingSurface = { fillStyle:"rgb(255,128,128)" };
+
+function randColor(){
+  return Math.floor(Math.random() * 255 )
+}
+
+function getVeg( vid ){
+  var n = vegstyle[vid];
+  if ( n ){
+    return n;
+  }
+  n = { fillStyle:"rgb("+randColor()+","+randColor()+","+randColor()+")" };
+  vegstyle[vid] = n;
+  return n;
+}
 
 function draw(){
   if ( canvas.width != body.clientWidth ||
@@ -48,10 +66,16 @@ function draw(){
     for ( var y=startY; y<endY ; y++ ){
       var n = world.getMapAt(x,y);
       var s = surface[ n.surface ] || missingSurface;
+      var sv = getVeg( n.veg );
       ctx.save();
       ctx.translate(x,y);
       ctx.fillStyle = s.fillStyle;
       ctx.fillRect(0.0, 0.0, 1.0, 1.0);
+      if ( n.veg !== 0 ){
+        ctx.fillStyle = sv.fillStyle;
+        ctx.fillRect(0.4, 0.4, 0.2, 0.2);
+ //       ctx.circle( 0.5 , 0.5 , 0.5 );
+      }
       ctx.restore();
     }
   }
