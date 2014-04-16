@@ -15,7 +15,7 @@ var world = (function(){
   
   function translate(x){
     if ( x > 0.5 ){
-      return 6; // mounts
+      return 6; // peaks
     }else if ( x > 0.4 ){
       return 5; // mounts
     }else if ( x > 0.2 ){
@@ -33,10 +33,14 @@ var world = (function(){
   
   function getPlant( pid ){
     if ( !plants[pid] ){
-      var min = Math.random() - 0.5;
-      var min = min*min;
+      var min = (Math.random()*2.0) - 0.5;
+      var min = (min*min*min)+0.1;
+      var max = min + Math.random();
+      if ( min < 0.1 && max > 0.12 ){
+        max = 0.12; // 
+      }
       plants[pid] = { minAlt : min,
-                      maxAlt : min + Math.random() };
+                      maxAlt : max };
     }
     return plants[pid];
   }
@@ -85,7 +89,7 @@ var world = (function(){
   }
   
   function getId(x,y){
-    return ""+Math.floor(x)+":"+Math.floor(y);
+    return "id:"+Math.floor(x)+":"+Math.floor(y);
   }
 
   var surfaceString = [
