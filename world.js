@@ -1,6 +1,7 @@
 var world = (function(){
   var seed = 0x5893;
   var map = {};
+  var plants = {};
   
   var nf = new ClassicalNoise();
   
@@ -29,9 +30,7 @@ var world = (function(){
       return 0; // deep
     }
   }
-
-  var plants = {};
-
+  
   function getPlant( pid ){
     if ( !plants[pid] ){
       var min = Math.random() - 0.5;
@@ -64,18 +63,6 @@ var world = (function(){
     }else{
       return 0; // outside plant's range - desert
     }
-/*
-    if ( v < -0.2 ){
-      // desert
-      return 0;
-    }else if ( v < 0.2 ){
-      // main flora
-      var v2 = 0.01 / (nf.noise(x*0.002,y*0.002,-20.0) * 1000);
-      return Math.floor(Math.abs(nf.noise(x*v2,y*v2,-40.0) * 20))
-    }else {
-      // special flora
-      return Math.floor(Math.abs(nf.noise(x*0.02,y*0.02,-40.0) * 20));
-    }*/
   }
 
   function vegAltCheck( alt , vid ){
@@ -100,8 +87,16 @@ var world = (function(){
   function getId(x,y){
     return ""+Math.floor(x)+":"+Math.floor(y);
   }
-  
+
+  var surfaceString = [
+  "Deep water","water","beach","lowlands","highlands","hills","peaks"];
+
   return {
-    getMapAt:getMapAt
+    getMapAt:getMapAt,
+    getPlant:getPlant,
+    decodeSurface:function(sid){ return surfaceString[sid] },
+    decodePlant:function(pid){
+      return pid+":"+JSON.stringify(getPlant(pid));
+    }
   };
 })();

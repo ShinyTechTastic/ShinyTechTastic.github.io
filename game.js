@@ -2,6 +2,7 @@
 var body = document.getElementById('body');
 var canvas = document.getElementById('bodyCanvas');
 var ctx = canvas.getContext('2d');
+var sidebar = document.getElementById('sidebar');
 
 var viewX = 0.0; // these control the view position
 var viewY = 0.0;
@@ -124,6 +125,16 @@ var stateReady = {
   mousedown:function( pos ){
     state = stateDragging;
     state.pos = pos;
+  },
+  mousemove:function( pos ){
+    var worldX = Math.floor((pos.x - viewX) / scale);
+    var worldY = Math.floor((pos.y - viewY) / scale);
+    var n = world.getMapAt(worldX,worldY);
+
+    sidebar.innerHTML= '<h2>Tile</h2>'+
+    '<p class="location">'+worldX+','+worldY+'</p>'+
+    '<p class="surface">'+world.decodeSurface(n.surface)+'</p>'+
+    '<p class="vegitation">'+world.decodePlant(n.veg)+'</p>';
   }
 }
 
