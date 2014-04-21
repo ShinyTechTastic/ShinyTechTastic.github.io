@@ -103,6 +103,20 @@ function getMousePos(evt) {
   };
 }
 
+function getTouchPos(evt) {
+  var rect = canvas.getBoundingClientRect();
+
+  if (event.targetTouches.length == 1) {
+    var touch = event.targetTouches[0];
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+  }else{
+    return null;
+  }
+}
+
 var stateDragging = {
   pos:{x:0,y:0},
   mousemove:function(pos){
@@ -133,12 +147,37 @@ var stateReady = {
 
     sidebar.innerHTML= '<h2>Tile</h2>'+
     '<p class="location">'+worldX+','+worldY+'</p>'+
+    '<p class="altitude">'+n.alt+'</p>'+
     '<p class="surface">'+world.decodeSurface(n.surface)+'</p>'+
     '<p class="vegitation">'+world.decodePlant(n.veg)+'</p>';
   }
 }
 
 var state = stateReady;
+
+
+canvas.addEventListener("touchstart", function(event){
+  if ( state.mousedown ){
+    var t = getTouchPos( event );
+    if (t) state.mousedown( t );
+  }
+}, true /* consume? */ );
+
+canvas.addEventListener('touchmove', function(event) {
+//  console.log("mousemove");
+  if ( state.mousemove ){
+    var t = getTouchPos( event );
+    if (t) state.mousemove( gt );
+  }
+}, true );
+
+canvas.addEventListener('touchend', function(event) {
+//  console.log("mouseup");
+  if ( state.mouseup ){
+    var t = getTouchPos( event );
+    if (t) state.mouseup( t );
+  }
+}, true );
 
 canvas.addEventListener("mousedown", function(event){
 //  console.log("mousedown");
