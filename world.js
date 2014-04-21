@@ -2,6 +2,13 @@ var world = (function(){
   var seed = 0x5893;
   var map = {};
   var plants = {};
+
+  var strataTypes = [
+    { peak:0.6 , mount:0.4 , trees:0.2 , plain:0.0, beach:-0.1, shallow:-0.2 },
+    { peak:0.6 , mount:0.4 , trees:0.3 , plain:0.0, beach:0.0, shallow:-0.4 },
+    { peak:0.9 , mount:0.7 , trees:-0.2 , plain:-0.4, beach:-0.7, shallow:-0.8 },
+    { peak:0.7 , mount:0.5 , trees:0.3 , plain:0.2, beach:0.1, shallow:-0.6 }
+  ];
   
   var nf = new ClassicalNoise();
   
@@ -13,22 +20,35 @@ var world = (function(){
     return map[id];
   }
   
-  function translate(x){
-    if ( x > 0.5 ){
-      return 6; // peaks
-    }else if ( x > 0.4 ){
-      return 5; // mounts
-    }else if ( x > 0.2 ){
-      return 4; // trees
-    }else if ( x > 0.12 ){
-      return 3; // plain
-    }else if ( x > 0.1 ){
-      return 2; // beach
-    }else if ( x > -0.2 ){
-      return 1; // shallow
+  function surfacetranslate(x,y){
+    var z = nf.noise(x*0.02,y*0.02,0.0);
+    var alt = (nf.noise(x*0.001,y*0.001,0.0) * 0.2 )
+            + (nf.noise(x*0.01,y*0.01,0.0)   * 0.2 )
+            + (nf.noise(z+x*0.1,y*0.1,-z   ) * 0.2 )
+            + (nf.noise(x*0.04,z+y*0.04,z  ) * 0.6 );
+    var strata = (nf.noise(x*0.0015,y*0.0015,0.0) * 0.6 )
+            + (nf.noise(x*0.01,y*0.01,0.0)   * 0.3 )
+            + (nf.noise(z+x*0.1,y*0.1,z   ) * 0.05 )
+            + (nf.noise(x*0.3,z+y*0.3,+z  ) * 0.05 );
+    strata = Math.floor(((strata*0.5)+0.5) * strataTypes.length);
+    var strataType = strataTypes[strata];
+    var surface = 0;
+    if ( alt > strataType.peak ){
+      surface = 6; // peaks
+    }else if ( alt > strataType.mount ){
+      surface = 5; // mounts
+    }else if ( alt > strataType.trees ){
+      surface = 4; // trees
+    }else if ( alt > strataType.plains ){
+      surface = 3; // plain
+    }else if ( alt > strataType.beach ){
+      surface = 2; // beach
+    }else if ( alt > strataType.shallow ){
+      surface = 1; // shallow
     }else{
-      return 0; // deep
+      surface = 0; // deep
     }
+    return { alt:alt , surface:surface , strata:strata };
   }
   
   function getPlant( pid ){
@@ -45,7 +65,7 @@ var world = (function(){
     return plants[pid];
   }
 
-  function vegtranslate( x , y ,alt ){
+  function vegtranslate( x , y , alt ){
     var z = nf.noise(x*0.02,y*0.02,5.0)*5.0;
     var l = (nf.noise(x*0.01,y*0.01,0.0) * 0.2)
           + (nf.noise(z+x*0.1,y*0.1,-z   ) * 0.2)
@@ -77,15 +97,9 @@ var world = (function(){
   }
   
   function generateMap(x,y,id){
-    var z = nf.noise(x*0.02,y*0.02,0.0);
-    var l = (nf.noise(x*0.01,y*0.01,0.0) * 0.2)
-          + (nf.noise(z+x*0.1,y*0.1,-z   ) * 0.2)
-          + (nf.noise(x*0.04,z+y*0.04,z  ) * 0.6);
-    var sv = translate( l );
-    return { 
-      surface : sv,
-      veg: vegtranslate(x,y,l)
-     };
+    var point = surfacetranslate( x,y );
+    point.veg = vegtranslate(x,y,point.alt,point.surface);
+    return point;
   }
   
   function getId(x,y){
