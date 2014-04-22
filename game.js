@@ -146,9 +146,10 @@ var stateReady = {
     var n = world.getMapAt(worldX,worldY);
 
     sidebar.innerHTML= '<h2>Tile</h2>'+
-    '<p class="location">'+worldX+','+worldY+'</p>'+
-    '<p class="altitude">'+n.alt+'</p>'+
-    '<p class="surface">'+world.decodeSurface(n.surface)+'</p>'+
+    '<p class="location">loc: '+worldX+','+worldY+'</p>'+
+    '<p class="altitude">alt: '+n.alt+'m</p>'+
+    '<p class="surface">surface: '+world.decodeSurface(n.surface)+
+    ' - '+world.decodeStrata(n.strata)+'</p>'+
     '<p class="vegitation">'+world.decodePlant(n.veg)+'</p>';
   }
 }

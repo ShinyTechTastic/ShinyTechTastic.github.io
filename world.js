@@ -7,6 +7,11 @@ var world = (function(){
 
   var strataTypes = 3;
   var plantCount = 25;
+
+  var strataString = [];
+  for ( var id=0 ; id<strataTypes ; id++ ){
+    strataString[id]=names.getName("strata",id);
+  }
   
   var nf = new ClassicalNoise();
   
@@ -31,6 +36,7 @@ var world = (function(){
     var strataBase = Math.floor(((strata*0.5)+0.5) * strataTypes);
     strata = 1.0 + (((strata*0.5)+0.5) * 0.2);
     alt = Math.floor( alt * strata * 1000 );
+    strataBase = Math.min( strataBase+Math.floor(alt/500) , strataTypes );
     var surface = 0;
     if ( alt > 950 ){
       surface = 6; // peaks
@@ -64,6 +70,7 @@ var world = (function(){
       var strataNum = Math.floor(Math.random() * strataTypes);
       plants[pid] = { minAlt : min*1000,
                       maxAlt : max*1000,
+                      name:names.getName("plants"),
                       strataNone: strataNum };
     }
     return plants[pid];
@@ -119,9 +126,8 @@ var world = (function(){
   return {
     getMapAt:getMapAt,
     getPlant:getPlant,
-    decodeSurface:function(sid){ return surfaceString[sid] },
-    decodePlant:function(pid){
-      return pid+":"+JSON.stringify(getPlant(pid));
-    }
+    decodeSurface:function(sid){ return surfaceString[sid]; },
+    decodeStrata:function(sid){ return strataString[sid]; },
+    decodePlant:function(pid){ return getPlant(pid).name||""; }
   };
 })();
