@@ -6,6 +6,12 @@ var controls = (function(){
     } },
     { title:"Zoom In" , click:function(){
       scale = Math.min(scale * 2.0 , 64.0);
+    } },
+    { title:"Toggle Veg" , click:function(){
+      showVeg = !showVeg;
+    } },
+    { title:"Toggle Rock" , click:function(){
+      showStrata = !showStrata;
     } }
   ];
 

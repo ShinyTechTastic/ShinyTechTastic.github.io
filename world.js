@@ -36,7 +36,7 @@ var world = (function(){
     var strataBase = Math.floor(((strata*0.5)+0.5) * strataTypes);
     strata = 1.0 + (((strata*0.5)+0.5) * 0.2);
     alt = Math.floor( alt * strata * 1000 );
-    strataBase = Math.min( strataBase+Math.floor(alt/500) , strataTypes );
+    strataBase = ( strataBase+Math.floor(alt/500)+strataTypes) % strataTypes
     var surface = 0;
     if ( alt > 950 ){
       surface = 6; // peaks

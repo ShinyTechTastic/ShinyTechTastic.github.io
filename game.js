@@ -9,6 +9,8 @@ var viewY = 0.0;
 
 var scale =  8; // the size of each tile
 
+var showVeg = true;
+var showStrata = false;
 
 var surface = {
    0 : { fillStyle:"rgb(0,0,80)"},
@@ -21,6 +23,10 @@ var surface = {
   };
 
 var vegstyle = {
+  0:{}
+};
+
+var stratastyle = {
   0:{}
 };
 
@@ -37,6 +43,16 @@ function getVeg( vid ){
   }
   n = { fillStyle:"rgb("+randColor()+","+randColor()+","+randColor()+")" };
   vegstyle[vid] = n;
+  return n;
+}
+
+function getStrata( vid ){
+  var n = stratastyle[vid];
+  if ( n ){
+    return n;
+  }
+  n = { fillStyle:"rgb("+randColor()+","+randColor()+","+randColor()+")" };
+  stratastyle[vid] = n;
   return n;
 }
 
@@ -67,15 +83,22 @@ function draw(){
     for ( var y=startY; y<endY ; y++ ){
       var n = world.getMapAt(x,y);
       var s = surface[ n.surface ] || missingSurface;
-      var sv = getVeg( n.veg );
       ctx.save();
       ctx.translate(x,y);
       ctx.fillStyle = s.fillStyle;
       ctx.fillRect(0.0, 0.0, 1.0, 1.0);
-      if ( n.veg !== 0 ){
+      if ( showVeg ){
+        if ( n.veg !== 0 ){
+          var sv = getVeg( n.veg );
+          ctx.fillStyle = sv.fillStyle;
+          ctx.fillRect(0.4, 0.4, 0.2, 0.2);
+   //       ctx.circle( 0.5 , 0.5 , 0.5 );
+        }
+      }
+      if ( showStrata ){
+        var sv = getStrata( n.strata );
         ctx.fillStyle = sv.fillStyle;
-        ctx.fillRect(0.4, 0.4, 0.2, 0.2);
- //       ctx.circle( 0.5 , 0.5 , 0.5 );
+        ctx.fillRect(0.1, 0.1, 0.2, 0.2);
       }
       ctx.restore();
     }
