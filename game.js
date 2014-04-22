@@ -209,3 +209,5 @@ canvas.addEventListener('mouseout', function(event) {
 
 setInterval(  update , 10 );
 setInterval(  draw , 20 );
+
+controls.setupButtons();
