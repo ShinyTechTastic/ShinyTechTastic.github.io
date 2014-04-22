@@ -1,14 +1,12 @@
 var world = (function(){
   var seed = 0x5893;
   var map = {};
-  var plants = {};
+  var plants = {
+    0:{}, // none
+  };
 
-  var strataTypes = [
-    { peak:0.6 , mount:0.4 , trees:0.2 , plain:0.0, beach:-0.1, shallow:-0.2 },
-    { peak:0.6 , mount:0.4 , trees:0.3 , plain:0.0, beach:0.0, shallow:-0.4 },
-    { peak:0.9 , mount:0.7 , trees:-0.2 , plain:-0.4, beach:-0.7, shallow:-0.8 },
-    { peak:0.7 , mount:0.5 , trees:0.3 , plain:0.2, beach:0.1, shallow:-0.6 }
-  ];
+  var strataTypes = 3;
+  var plantCount = 25;
   
   var nf = new ClassicalNoise();
   
@@ -30,42 +28,48 @@ var world = (function(){
             + (nf.noise(x*0.01,y*0.01,0.0)   * 0.3 )
             + (nf.noise(z+x*0.1,y*0.1,z   ) * 0.05 )
             + (nf.noise(x*0.3,z+y*0.3,+z  ) * 0.05 );
-    strata = Math.floor(((strata*0.5)+0.5) * strataTypes.length);
-    var strataType = strataTypes[strata];
+    var strataBase = Math.floor(((strata*0.5)+0.5) * strataTypes);
+    strata = 1.0 + (((strata*0.5)+0.5) * 0.2);
+    alt = Math.floor( alt * strata * 1000 );
     var surface = 0;
-    if ( alt > strataType.peak ){
+    if ( alt > 950 ){
       surface = 6; // peaks
-    }else if ( alt > strataType.mount ){
+    }else if ( alt > 800 ){
       surface = 5; // mounts
-    }else if ( alt > strataType.trees ){
+    }else if ( alt > 200 ){
       surface = 4; // trees
-    }else if ( alt > strataType.plains ){
+    }else if ( alt > 5 ){
       surface = 3; // plain
-    }else if ( alt > strataType.beach ){
+    }else if ( alt > -5 ){
       surface = 2; // beach
-    }else if ( alt > strataType.shallow ){
+    }else if ( alt > -60 ){
       surface = 1; // shallow
     }else{
       surface = 0; // deep
     }
-    return { alt:alt , surface:surface , strata:strata };
+    return { alt:alt , surface:surface , strata:strataBase };
   }
   
   function getPlant( pid ){
     if ( !plants[pid] ){
-      var min = (Math.random()*2.0) - 0.5;
-      var min = (min*min*min)+0.1;
+      var min = (Math.random()*1.4)-0.4;
+      var min = (min*min*min);
       var max = min + Math.random();
-      if ( min < 0.1 && max > 0.12 ){
-        max = 0.12; // 
+      if ( min < 0.05 && max > 0.05 ){
+        max = 0.05; // 
       }
-      plants[pid] = { minAlt : min,
-                      maxAlt : max };
+      if ( min < -0.05 && max > 0.05 ){
+        max = 0.05; // 
+      }
+      var strataNum = Math.floor(Math.random() * strataTypes);
+      plants[pid] = { minAlt : min*1000,
+                      maxAlt : max*1000,
+                      strataNone: strataNum };
     }
     return plants[pid];
   }
 
-  function vegtranslate( x , y , alt ){
+  function vegtranslate( x , y , data ){
     var z = nf.noise(x*0.02,y*0.02,5.0)*5.0;
     var l = (nf.noise(x*0.01,y*0.01,0.0) * 0.2)
           + (nf.noise(z+x*0.1,y*0.1,-z   ) * 0.2)
@@ -80,13 +84,16 @@ var world = (function(){
     }else{
       return 0;// desert
     }
-    var p = Math.floor((nf.noise(x*scale,y*scale,-5.0)+1)*25.0);
-    var plant = getPlant(p);
-    if ( plant.minAlt < alt && plant.maxAlt > alt ){
-      return p;
-    }else{
-      return 0; // outside plant's range - desert
+    var p = 1 + (Math.floor((nf.noise(x*scale,y*scale,-5.0)+1)* plantCount ));
+    for ( var n=0;n<10;n++){
+      var plant = getPlant(p+n);
+      if ( (plant.minAlt < data.alt) && 
+           (plant.maxAlt > data.alt) &&
+           (plant.strataNone != data.strata) ){
+        return p+n;
+      }
     }
+    return 0; // no valid plants found...
   }
 
   function vegAltCheck( alt , vid ){
@@ -98,7 +105,7 @@ var world = (function(){
   
   function generateMap(x,y,id){
     var point = surfacetranslate( x,y );
-    point.veg = vegtranslate(x,y,point.alt,point.surface);
+    point.veg = vegtranslate(x,y,point);
     return point;
   }
   
