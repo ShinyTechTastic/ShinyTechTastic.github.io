@@ -12,6 +12,9 @@ var controls = (function(){
     } },
     { title:"Toggle Rock" , click:function(){
       showStrata = !showStrata;
+    } },
+    { title:"Deploy Lander" , click:function(){
+      state = stateLander;
     } }
   ];
 
