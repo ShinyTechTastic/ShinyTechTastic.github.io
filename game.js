@@ -53,7 +53,7 @@ var stateLander = {
 
     render.setExtra( function(context){
       context.beginPath();
-      context.arc(world.x, world.y, 8, 0, 2 * Math.PI, false);
+      context.arc(worldPos.x, worldPos.y, 8, 0, 2 * Math.PI, false);
       context.fillStyle = 'rgba(255,255,0,0.2)';
       context.fill();
       context.lineWidth = 0.2;
